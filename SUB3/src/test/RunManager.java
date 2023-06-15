@@ -1,7 +1,6 @@
 package test;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
@@ -11,7 +10,6 @@ import org.eclipse.jetty.http.HttpMethod;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
 public class RunManager {
 
@@ -25,71 +23,105 @@ public class RunManager {
 
 	public static void testOnHttp() throws Exception {
 
-		//MyClient client = new MyClient();
+		// HttpClient 작성과 시작
 		HttpClient client = new HttpClient();
 		client.start();
+
+		// HttpClient로 보낼 GET Request 작성, timeout 없음
 		Request request = client.newRequest("http://127.0.0.1:8080/queueInfo")
 				.method(HttpMethod.GET)
 				.timeout(0, TimeUnit.MINUTES)
 				.idleTimeout(0, TimeUnit.MINUTES);
+
+		// Request 보내고 응답받기
 		ContentResponse response = request.send();
+
+		// Response 본문을 String 변수로 받기
 		String queueInfoText = "";
 		if (response.getStatus() == 200) {
 			queueInfoText = response.getContentAsString();
 		}
-		//String queueInfoText = client.get("http://127.0.0.1:8080/queueInfo");
+
+		// String 변수로 받은 Response 분문을 JsonObject 변수에 담기
 		Gson gson = new Gson();
 		JsonObject queueInfoJO = gson.fromJson(queueInfoText, JsonObject.class);
+
+		// 원격 서버에서 제공해준 정보를 변수들에 나눠담기
 		int queueCount = queueInfoJO.get("inputQueueCount").getAsInt();
 		LinkedList<String> inputQueueURIs = MyJson.convertJsonArrayToStringList(queueInfoJO.get("inputQueueURIs").getAsJsonArray());
 		String outputQueueURI = queueInfoJO.get("outputQueueURI").getAsString();
 
+		// 프로그램에서 사용할 Worker(들)을 담을 변수 선언
 		HashMap<Integer, Worker> workerHashMap = new HashMap<>();
 
+		// 입력용 큐 URI 별 작업 처리
 		for (int i = 0; i < inputQueueURIs.size(); i++) {
+
+			// Worker(들)을 담을 변수에 Worker 인스턴스 생성해서 담기
 			int queueNo = i;
 			if (!workerHashMap.containsKey(i)) {
 				workerHashMap.put(i, new Worker(i));
 			}
+
+			// 스레드 변수 선언
+			// 스레드 안에서 할 작업 내용은 람다식(Lambda expression)으로 작성됨
 			Thread thread = new Thread(() -> {
+
+				// 스레드 이름
 				String threadName = Thread.currentThread().getName() + " [" + queueNo + "] "+ inputQueueURIs.get(queueNo);
+
 				try {
+
+					// 무한하게 실행
 					while(true) {
+
+						// HttpClient로 보낼 GET Request 작성, timeout 없음
 						Request req = client.newRequest(inputQueueURIs.get(queueNo))
 								.method(HttpMethod.GET)
 								.timeout(0, TimeUnit.MINUTES)
 								.idleTimeout(0, TimeUnit.MINUTES);
+
+						// Request 보내고 응답받기
 						ContentResponse resp = req.send();
+
+						// Response 본문을 String 변수로 받기
 						String inputStr = "";
 						if (resp.getStatus() == 200) {
 							inputStr = resp.getContentAsString();
 						}
-						System.out.println(threadName + " " + inputStr);
+
+						// String 변수로 받은 Response 분문을 JsonObject 변수에 담기
 						JsonObject inputJson = MyJson.convertStringToJsonObject(inputStr);
 
-						// �޾ƿ� �����͸� �̿��� Worker ����
+						// JsonObject 변수에 담긴 데이터를 이용해서 Worker 인스턴스에 작업을 시킴
 						int timestamp = inputJson.get("timestamp").getAsInt();
 						String value = inputJson.get("value").getAsString();
 						String result = workerHashMap.get(queueNo).run(timestamp, value);
-						System.out.println(threadName + " result from Worker: " + result);
 
-						// Worker ���� ��� ��ȯ
+						// Worker 인스턴스로부터 받은 작업 결과가 있을 때만 output 용도의 Request 보냄
 						if (result != null) {
-							System.out.println(threadName + " to " + outputQueueURI);
+
+							// output 용도로 보낼 Json을 담을 JsonObject 변수 생성
 							JsonObject outputJson = new JsonObject();
+							// JsonObject 변수에 result 속성 추가
 							outputJson.addProperty("result", result);
+							// JsonObject 변수를 request 본문에 담을 수 있게 StringContentProvider 변수에 담기
+							StringContentProvider outputStr = new StringContentProvider(outputJson.toString());
+							// output 용도로 HttpClient로 보낼 POST Request 작성
+							// timeout 없으며 앞서 작성한 StringContentProvider를 본문에 담음
 							req = client.newRequest(outputQueueURI)
 									.method(HttpMethod.POST)
 									.timeout(0, TimeUnit.MINUTES)
 									.idleTimeout(0, TimeUnit.MINUTES)
-									.content(new StringContentProvider(outputJson.toString()));
+									.content(outputStr);
+							// Request 보내고 응답받기
 							resp = req.send();
-							String outputStr = "";
+							// 정상 응답을 받은 경우
 							if (resp.getStatus() == 200) {
-								outputStr = resp.getContentAsString();
+								// 응답받은 본문을 화면에 출력
+								System.out.println(resp.getContentAsString());
 							}
-							//String outputStr = client.post(outputQueueURI, MyJson.convertJsonObjectToString(outputJson));
-							System.out.println(threadName + " output : " + outputStr);
+
 						}
 					}
 
@@ -98,144 +130,18 @@ public class RunManager {
 					e.printStackTrace();
 				}
 			});
+
+			// 스레드 시작 - 비동기(Async)로 시작됨
 			thread.start();
 		}
 
+		// 프로그램 종료까지 20초 대기
 		Thread.sleep(20000);
 
+		// HttpClient 정지
 		client.stop();
 
-//		ExecutorService executorService = Executors.newFixedThreadPool(inputQueueURIs.size());
-
-//		// URL ����� ��ȸ�ϸ鼭 ��û�� �����ϴ�.
-//		List<Future<String>> futures = new ArrayList<>();
-//		for (int i = 0; i < inputQueueURIs.size(); i++) {
-//			String url = inputQueueURIs.get(i);
-//			int queueNo = i;
-//			if (!workerHashMap.containsKey(i)) {
-//				workerHashMap.put(i, new Worker(i));
-//			}
-//			Future<String> future = executorService.submit(() -> {
-//				try {
-//					// �Է� ������ ��û
-//					String threadName = Thread.currentThread().getName() + " [" + queueNo + "] ";
-//					System.out.println(threadName + " url : " + url);
-//					Request req = client.newRequest(url)
-//							.method(HttpMethod.GET)
-//							.timeout(0, TimeUnit.MINUTES)
-//							.idleTimeout(0, TimeUnit.MINUTES);
-//					ContentResponse resp = req.send();
-//					//String inputStr = client.get(url);
-//					String inputStr = "";
-//					if (resp.getStatus() == 200) {
-//						inputStr = resp.getContentAsString();
-//					}
-//					System.out.println(threadName + " input : " + inputStr);
-//					JsonObject inputJson = MyJson.convertStringToJsonObject(inputStr);
-//
-//					// �޾ƿ� �����͸� �̿��� Worker ����
-//					int timestamp = inputJson.get("timestamp").getAsInt();
-//					String value = inputJson.get("value").getAsString();
-//					String result = workerHashMap.get(queueNo).run(timestamp, value);
-//					System.out.println(threadName + " result from Worker: " + result);
-//
-//					// Worker ���� ��� ��ȯ
-//					if (result != null) {
-//						JsonObject outputJson = new JsonObject();
-//						outputJson.addProperty("result", result);
-//						req = client.newRequest(outputQueueURI)
-//								.method(HttpMethod.POST)
-//								.timeout(0, TimeUnit.MINUTES)
-//								.idleTimeout(0, TimeUnit.MINUTES);
-//						resp = req.send();
-//						String outputStr = "";
-//						if (resp.getStatus() == 200) {
-//							outputStr = resp.getContentAsString();
-//						}
-//						//String outputStr = client.post(outputQueueURI, MyJson.convertJsonObjectToString(outputJson));
-//						System.out.println(threadName + " output : " + outputStr);
-//					}
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				} finally {
-//					return null;
-//				}
-//			});
-//			futures.add(future);
-//		}
-//
-//		// ��� ��û�� ����� ��ٸ��ϴ�.
-//		for (Future<String> future : futures) {
-//			String r = null;
-//			try {
-//				System.out.println("future: "+ future.toString());
-//				r = future.get();
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//			System.out.println(r);
-//		}
-//
-//		// URL ����� ��ȸ�ϸ鼭 ��û�� �����ϴ�.
-//		List<CompletableFuture<String>> futures = inputQueueURIs.stream()
-//				.map(url -> CompletableFuture.supplyAsync(() -> {
-//					try {
-//						while (true) {
-//							System.out.println(Thread.currentThread().getName() + " : url : " + url);
-//							String inputStr = client.get(url);
-//							System.out.println(Thread.currentThread().getName() + " : input : " + inputStr);
-//							JsonObject inputJson = MyJson.convertStringToJsonObject(inputStr);
-//							JsonObject outputJson = new JsonObject();
-//							outputJson.addProperty("result", inputJson.get("value").getAsString());
-//							String outputStr = client.post(outputQueueURI, MyJson.convertJsonObjectToString(outputJson));
-//							System.out.println(Thread.currentThread().getName() + " : output : " + outputStr);
-//						}
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//					} finally {
-//						return "";
-//					}
-//				}, executorService))
-//				.collect(Collectors.toList());
-
-		// ��� ��û�� ����� ��ٸ��ϴ�.
-		// ���� ����� �߿��� �� �ƴϰ�, ��������� ������ �ʵ��� �ϴ� ����
-//		for (CompletableFuture<String> future : futures) {
-//			String response = future.get();
-//			System.out.println(response);
-//		}
-
-//		int port = 8080;
-//		MyServer server = MyServer.getInstance(port);
-//		while (true) {
-//			Thread.sleep(1000L);
-//		}
-
-		//executorService.shutdown();
-		//client.stop();
 	}
 
-	public static void testOnConsole() {
-		HashMap<Integer, Worker> workerHashMap = new HashMap<>();
-
-		Scanner sc = new Scanner(System.in);
-		while (true) {
-			String line = sc.nextLine();
-			if (line.equals("exit")) {
-				break;
-			} else {
-				String[] commands = MyString.splitToStringArray(line, " ", true);
-				long timestamp = Integer.parseInt(commands[0]);
-				int queueNo = Integer.parseInt(commands[1]);
-				String value = commands[2];
-				if (!workerHashMap.containsKey(queueNo)) {
-					workerHashMap.put(queueNo, new Worker(queueNo));
-				}
-				String result = workerHashMap.get(queueNo).run(timestamp, value);
-				if (result != null) {
-					System.out.println(result);
-				}
-			}
-		}
-	}
 }
+
