@@ -1,5 +1,3 @@
-하기 내용을 반드시 숙지하고 시험 응시 바랍니다. 
-
 package test;
 
 public class Worker extends AbstractWorker {
