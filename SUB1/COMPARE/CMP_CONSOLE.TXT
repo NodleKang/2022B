@@ -1,0 +1,8 @@
+C:\>SP_TEST<¿£ÅÍÅ°>
+0 VIEW_AD1
+1 VIEW_AD2
+0 CLICK_AD1
+Worker(0):Matched AD1
+1 CLICK_AD3
+1 CLICK_AD2
+Worker(1):Matched AD2

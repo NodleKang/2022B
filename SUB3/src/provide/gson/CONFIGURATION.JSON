@@ -1,0 +1,5 @@
+{  "inputQueueCount":3,
+   "inputQueueURIs":["http://127.0.0.1:8010/input",
+                     "http://127.0.0.1:8011/input",
+                     "http://127.0.0.1:8012/input"],
+   "outputQueueURI":"http://127.0.0.1:9010/output"  }

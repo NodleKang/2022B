@@ -1,0 +1,12 @@
+{  "processCount":1,
+   "threadCount":3,
+   "outputQueueBatchSize":1,
+   "inputQueueCount":6,
+   "inputQueueURIs":["http://127.0.0.1:8010/input",
+                     "http://127.0.0.1:8011/input",
+                     "http://127.0.0.1:8012/input",
+                     "http://127.0.0.1:8013/input",
+                     "http://127.0.0.1:8014/input",
+                     "http://127.0.0.1:8015/input"],
+   "outputQueueURI":"http://127.0.0.1:9010/output"  }
+ 
