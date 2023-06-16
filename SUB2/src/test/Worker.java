@@ -1,6 +1,7 @@
 package test;
 
-import java.util.ArrayList;
+import com.lgcns.test.AbstractWorker;
+
 import java.util.List;
 
 /* ----------------------------------------------------------------------------

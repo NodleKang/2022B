@@ -1,5 +1,7 @@
 package test;
 
+import com.lgcns.test.Worker;
+
 import java.util.HashMap;
 import java.util.Scanner;
 
