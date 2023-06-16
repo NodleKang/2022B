@@ -1,9 +1,35 @@
 package test;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class MyFile {
+
+    // 현재 경로(path) 반환
+    public static String getCurrentDirectoryFullPath() {
+        String currentPath = Paths.get("").toAbsolutePath().toString();
+        return currentPath;
+    }
+
+    // 주어진 경로(path)의 상위 경로 반환
+    public static String getParentDirectoryFullPath(String directoryFullPath) {
+        File directory = new File(directoryFullPath);
+        return directory.getParent();
+    }
+
+    // 주어진 경로(path) 하위의 모든 파일 이름 반환
+    public static List<String> getFileNames(String directoryFullPath) {
+        List<String> fileNames = new ArrayList<String>();
+        File directory = new File(directoryFullPath);
+        File[] files = directory.listFiles();
+        for (File file : files) {
+            if (file.isFile()) {
+                fileNames.add(file.getName());
+            }
+        }
+        return fileNames;
+    }
 
     // 주어진 경로(path)에 해당하는 파일이 존재하는지 여부 반환
     public static boolean checkFileExists(String fileFullPath) {
