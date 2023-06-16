@@ -21,6 +21,7 @@ public class RunManager {
 		}
 	}
 
+	// Thread를 사용한 멀티스레드 비동기 실행
 	public static void testOnHttp() throws Exception {
 
 		// HttpClient 작성과 시작
@@ -63,7 +64,7 @@ public class RunManager {
 				workerHashMap.put(i, new Worker(i));
 			}
 
-			// 스레드 변수 선언
+			// Thread 변수 선언
 			// 스레드 안에서 할 작업 내용은 람다식(Lambda expression)으로 작성됨
 			Thread thread = new Thread(() -> {
 
