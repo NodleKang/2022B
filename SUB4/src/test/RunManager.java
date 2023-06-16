@@ -1,6 +1,7 @@
 package test;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 
 public class RunManager {
 
@@ -12,21 +13,30 @@ public class RunManager {
 
 
 		try {
-			testOnHttp();
+			test();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
-	public static void testOnHttp() throws Exception {
+	public static void test() throws Exception {
 
 		int processCount = 2;
 		int threadCount = 3;
+		
+		String currentPath = Paths.get("").toAbsolutePath().toString();
 
 		for (int i=0; i < processCount; i++) {
 			try {
-				Process process = new ProcessBuilder("notepad").start();
+				//String command = "javac "+currentPath+ "\\src\\test\\" + "ThreadTest.java";
+				String command = "java -version";
+				Process process = new ProcessBuilder("java", "-version").start();
+				System.out.println(process.info());
+				System.out.println(process.toString());
+				System.out.println(process.isAlive());
+				process.destroy();
+				System.out.println(process.exitValue());
 				process.info().command().ifPresent(System.out::println);
 				Thread.sleep(1000);
 			} catch (IOException | InterruptedException e) {
