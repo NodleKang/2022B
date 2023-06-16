@@ -12,6 +12,11 @@ public class ExeRunner {
 			System.out.println("Current Path: " + path);
 
 			//ProcessBuilder pb = new ProcessBuilder("실행파일", "아규먼트");
+			/*
+			C:\sp_workspace\2022B\SUB4\src>java -cp . test/ThreadTest.java
+			ThreadTest.start()
+			ThreadTest.end()
+			 */
 			ProcessBuilder pb = new ProcessBuilder("javac", "ThreadTest.java");
 			pb.directory(new File(path)); // 명령어가 실행될 경로
 			pb.redirectErrorStream(true); // 명령어 실행 도중에 오류가 발생하면 getInputStream()에서 오류 메시지도 함께 읽어온다.
