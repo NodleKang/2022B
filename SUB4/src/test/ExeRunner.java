@@ -5,7 +5,40 @@ import java.io.*;
 public class ExeRunner {
 	
 	public static void main(String[] args) {
-		
+
+		try {
+			test();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private static void test() {
+		String path = MyFile.getCurrentDirectoryFullPath();
+		path = path + "\\SUB4\\src";
+
+		ProcessBuilder pb = new ProcessBuilder("javac", "-cp", ".", "test/ThreadTest.java");
+		pb.directory(new File(path)); // 명령어가 실행될 경로
+		pb.redirectErrorStream(true); // 명령어 실행 도중에 오류가 발생하면 getInputStream()에서 오류 메시지도 함께 읽어온다.
+
+		try {
+			Process process = pb.start();
+
+			InputStream inputStream = process.getInputStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				System.out.println(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private static void test2() {
+
 		try {
 			String path = MyFile.getCurrentDirectoryFullPath();
 			path = "C:\\sp_workspace\\2022B\\SUB4\\src\\test";
@@ -18,6 +51,7 @@ public class ExeRunner {
 			ThreadTest.end()
 			 */
 			ProcessBuilder pb = new ProcessBuilder("javac", "ThreadTest.java");
+			pb = new ProcessBuilder("javac", "-cp", ".", "test/ThreadTest.java");
 			pb.directory(new File(path)); // 명령어가 실행될 경로
 			pb.redirectErrorStream(true); // 명령어 실행 도중에 오류가 발생하면 getInputStream()에서 오류 메시지도 함께 읽어온다.
 			Process process = pb.start();
