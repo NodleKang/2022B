@@ -213,7 +213,14 @@ public class MockMain {
         protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
             String body = req.getReader().lines().collect(Collectors.joining());
             WorkerCall workerCall = (WorkerCall)MockMain.this.gson.fromJson(body, WorkerCall.class);
-            System.out.println(String.format("[SP_TEST의 Worker(%d) 실행] Process Id(%d), Thread Id(%d)", new Object[] { Integer.valueOf(workerCall.getQueueNo()), Long.valueOf(workerCall.getProcessId()), Long.valueOf(workerCall.getThreadId()) }));
+            System.out.println(
+                    String.format("[SP_TEST의 Worker(%d) 실행] Process Id(%d), Thread Id(%d)",
+                            new Object[] {
+                                    Integer.valueOf(workerCall.getQueueNo()),
+                                    Long.valueOf(workerCall.getProcessId()),
+                                    Long.valueOf(workerCall.getThreadId()) }
+                    )
+            );
             MockMain.this.workerCallQueue.add(workerCall);
             res.setStatus(200);
         }
