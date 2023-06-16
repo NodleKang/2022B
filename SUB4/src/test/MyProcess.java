@@ -18,6 +18,18 @@ public class MyProcess {
             e.printStackTrace();
         }
 
+        try {
+            testOnCompletableFuture(processNo, threadCount);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            testOnCompletableFuture2(processNo, threadCount);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
         System.out.println("Process ["+processNo+"] End");
     }
 
@@ -47,6 +59,46 @@ public class MyProcess {
             System.out.println(future.get());
         }
         executorService.shutdown();
+    }
+
+    private static void testOnCompletableFuture(int processNo, int threadCount) throws ExecutionException, InterruptedException {
+        List<CompletableFuture<String>> completableFutureList = new ArrayList<>();
+        for (int i = 0; i < threadCount; i++) {
+            CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
+                return "Process [" + processNo + "] Thread: " + Thread.currentThread().getName();
+            });
+            completableFutureList.add(completableFuture);
+        }
+        CompletableFuture.allOf(completableFutureList.toArray(new CompletableFuture[0]))
+                .thenAccept((voidValue) -> {
+                    completableFutureList.forEach((completableFuture) -> {
+                        try {
+                            System.out.println(completableFuture.get());
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                });
+    }
+
+    private static void testOnCompletableFuture2(int processNo, int threadCount) throws ExecutionException, InterruptedException {
+        List<CompletableFuture<String>> completableFutureList = new ArrayList<>();
+        for (int i = 0; i < threadCount; i++) {
+            CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(() -> {
+                return "Process [" + processNo + "] Thread: " + Thread.currentThread().getName();
+            });
+            completableFutureList.add(completableFuture);
+        }
+        CompletableFuture.allOf(completableFutureList.toArray(new CompletableFuture[0]))
+                .join();
+        for (int i = 0; i < threadCount; i++) {
+            CompletableFuture<String> completableFuture = completableFutureList.get(i);
+            try {
+                System.out.println(completableFuture.get());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
