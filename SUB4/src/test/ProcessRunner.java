@@ -8,7 +8,7 @@ public class ProcessRunner {
         int processCount = 2;
         int threadCount = 2;
         ProcessBuilder[] processBuilders = new ProcessBuilder[processCount];
-        for (int i = 0; i < processCount; i++) {
+    for (int i = 0; i < processCount; i++) {
             String path = MyFile.getCurrentDirectoryFullPath();
             path = path + "\\SUB4\\src";
             System.out.println("Current Path: " + path);

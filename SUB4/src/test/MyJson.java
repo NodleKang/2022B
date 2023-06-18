@@ -2,7 +2,10 @@ package test;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import java.util.LinkedList;
 
 public class MyJson {
 
@@ -28,6 +31,14 @@ public class MyJson {
         Gson gson = new Gson();
         String jsonStr = gson.toJson(jsonArray);
         return jsonStr;
+    }
+
+    public static LinkedList<String> convertJsonArrayToStringList(JsonArray jsonArray) {
+        LinkedList<String> list = new LinkedList<String>();
+        for (JsonElement element: jsonArray) {
+            list.add(element.getAsString());
+        }
+        return list;
     }
 
 }

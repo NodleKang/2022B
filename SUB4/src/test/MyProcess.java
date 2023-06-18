@@ -1,12 +1,22 @@
 package test;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.*;
 
 public class MyProcess {
 
+    public LinkedList<String> workers = new LinkedList<>();
+
+    public MyProcess() {
+    }
+
     public static void main(String[] args) {
+        MyProcess myProcess = new MyProcess();
+        myProcess.workers.add("test1");
+        myProcess.workers.add("test2");
+
         int processNo = Integer.parseInt(args[0]);
         int threadCount = Integer.parseInt(args[1]);
 
