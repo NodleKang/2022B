@@ -1,36 +1,53 @@
 package test;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.lgcns.test.AbstractWorker;
 
 /* ----------------------------------------------------------------------------
  * 
- * Worker.java - removeExpiredStoreItems() ±¸Çö, ±× ¿Ü º¯°æ ±İÁö
+ * Worker.java - removeExpiredStoreItems() ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
  * 
  * ----------------------------------------------------------------------------
  */
 public class Worker extends AbstractWorker {
 	
 	/*
-	 * ¡Ø Worker »ı¼º
-	 * - <Queue ¹øÈ£>¸¦ ÆÄ¶ó¹ÌÅÍ·Î ÇÏ¿© Worker ÀÎ½ºÅÏ½º »ı¼º
+	 * ï¿½ï¿½ Worker ï¿½ï¿½ï¿½ï¿½
+	 * - <Queue ï¿½ï¿½È£>ï¿½ï¿½ ï¿½Ä¶ï¿½ï¿½ï¿½Í·ï¿½ ï¿½Ï¿ï¿½ Worker ï¿½Î½ï¿½ï¿½Ï½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	 */
 	public Worker(int queueNo) {
 		super(queueNo);
 	}
 	
 	/*
-	 * ¡Ø ¸¸·áµÈ Store Item Á¦°Å
-	 * - ÀÔ·ÂµÈ Timestamp¿Í Store ItemÀÇ Timestamp°£ÀÇ Â÷ÀÌ°¡ ¸¸·á½Ã°£(3000)À» ÃÊ°úÇÏ¸é Store¿¡¼­ Á¦°Å
+	 * ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ Store Item ï¿½ï¿½ï¿½ï¿½
+	 * - ï¿½Ô·Âµï¿½ Timestampï¿½ï¿½ Store Itemï¿½ï¿½ Timestampï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì°ï¿½ ï¿½ï¿½ï¿½ï¿½Ã°ï¿½(3000)ï¿½ï¿½ ï¿½Ê°ï¿½ï¿½Ï¸ï¿½ Storeï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	 */
 	public void removeExpiredStoreItems(long timestamp, List<String> store) {
 		for(int i = store.size()-1; i >= 0; i--) {
 			String line = store.get(i);
-			String[] element = MyString.splitToStringArray(line, "#", true);
+			String[] element = splitToStringArray(line, "#", true);
 			long timeout = Long.parseLong(element[0]);
 			if (timestamp - timeout > 3000) {
 				store.remove(i);
 			}
 		}
-		//throw new UnsupportedOperationException("removeExpiredStoreItems()¸¦ 3¹ø ¹®Ç×¿¡¼­ º¹»çÇÏ¼¼¿ä.");
+		//throw new UnsupportedOperationException("removeExpiredStoreItems()ï¿½ï¿½ 3ï¿½ï¿½ ï¿½ï¿½ï¿½×¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½.");
 	}
+	
+	private String[] splitToStringArray(String str, String delimiter, boolean removeEmptyString) {
+        String[] strArr = str.split(delimiter);
+        ArrayList<String> strList = new ArrayList<String>();
+        for (String s : strArr) {
+            // ë¹ˆ ë¬¸ìì—´ ì œê±° ì—¬ë¶€ê°€ trueì´ê³  ë¹ˆ ë¬¸ìì—´ì¸ ê²½ìš°ì—ëŠ” ë¦¬ìŠ¤íŠ¸ì— ì¶”ê°€í•˜ì§€ ì•ŠìŒ
+            if (removeEmptyString && s.isEmpty()) {
+                continue;
+            }
+            strList.add(s);
+        }
+        strArr = strList.toArray(new String[strList.size()]);
+        return strArr;
+    }
 }

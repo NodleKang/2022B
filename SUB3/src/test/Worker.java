@@ -1,26 +1,27 @@
 package test;
 
 import java.util.List;
+import com.lgcns.test.*;
 
 /* ----------------------------------------------------------------------------
  *
- * Worker.java - removeExpiredStoreItems() ±¸Çö, ±× ¿Ü º¯°æ ±ÝÁö
+ * Worker.java - removeExpiredStoreItems() ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
  *
  * ----------------------------------------------------------------------------
  */
 public class Worker extends AbstractWorker {
 
 	/*
-	 * ¡Ø Worker »ý¼º
-	 * - <Queue ¹øÈ£>¸¦ ÆÄ¶ó¹ÌÅÍ·Î ÇÏ¿© Worker ÀÎ½ºÅÏ½º »ý¼º
+	 * ï¿½ï¿½ Worker ï¿½ï¿½ï¿½ï¿½
+	 * - <Queue ï¿½ï¿½È£>ï¿½ï¿½ ï¿½Ä¶ï¿½ï¿½ï¿½Í·ï¿½ ï¿½Ï¿ï¿½ Worker ï¿½Î½ï¿½ï¿½Ï½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	 */
 	public Worker(int queueNo) {
 		super(queueNo);
 	}
 
 	/*
-	 * ¡Ø ¸¸·áµÈ Store Item Á¦°Å
-	 * - ÀÔ·ÂµÈ Timestamp¿Í Store ItemÀÇ Timestamp°£ÀÇ Â÷ÀÌ°¡ ¸¸·á½Ã°£(3000)À» ÃÊ°úÇÏ¸é Store¿¡¼­ Á¦°Å
+	 * ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ Store Item ï¿½ï¿½ï¿½ï¿½
+	 * - ï¿½Ô·Âµï¿½ Timestampï¿½ï¿½ Store Itemï¿½ï¿½ Timestampï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì°ï¿½ ï¿½ï¿½ï¿½ï¿½Ã°ï¿½(3000)ï¿½ï¿½ ï¿½Ê°ï¿½ï¿½Ï¸ï¿½ Storeï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	 */
 	public void removeExpiredStoreItems(long timestamp, List<String> store) {
 		for(int i = store.size()-1; i >= 0; i--) {
@@ -31,6 +32,6 @@ public class Worker extends AbstractWorker {
 				store.remove(i);
 			}
 		}
-		// throw new UnsupportedOperationException("removeExpiredStoreItems()¸¦ ±¸ÇöÇÏ¼¼¿ä.");
+		// throw new UnsupportedOperationException("removeExpiredStoreItems()ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½.");
 	}
 }

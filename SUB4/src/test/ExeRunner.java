@@ -15,6 +15,7 @@ public class ExeRunner {
 	}
 
 	private static void test() {
+		
 		String path = MyFile.getCurrentDirectoryFullPath();
 		path = path + "\\SUB4\\src";
 
